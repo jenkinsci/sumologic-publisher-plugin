@@ -5,7 +5,7 @@
         <!-- https://mvnrepository.com/artifact/org.jenkins-ci.plugins/plugin -->
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>4.10</version>
+        <version>4.66</version>
         <relativePath />
     </parent>
     <artifactId>sumologic-publisher</artifactId>
