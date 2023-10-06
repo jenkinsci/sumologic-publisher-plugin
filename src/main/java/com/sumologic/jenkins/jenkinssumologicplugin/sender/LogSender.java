@@ -69,18 +69,18 @@ public class LogSender {
         };
         
         //proxy enablement
-        PluginDescriptorImpl descriptor = PluginDescriptorImpl.getInstance();
-        enableProxy = descriptor.getEnableProxy();
-		enableProxyAuth = descriptor.getEnableProxyAuth();
+        PluginConfiguration pluginConfig = PluginDescriptorImpl.getPluginConfiguration();
+        enableProxy = pluginConfig.isEnableProxy();
+		enableProxyAuth = pluginConfig.isEnableProxyAuth();
 		CredentialsProvider credsProvider = null;
 		if (this.enableProxy) {
-			String proxyHost = descriptor.getProxyHost();
-			int proxyPort = descriptor.getProxyPort();
+			String proxyHost = pluginConfig.getProxyHost();
+			int proxyPort = pluginConfig.getProxyPort();
 			if (enableProxyAuth) {
 				AuthScope authScope = new AuthScope(proxyHost, proxyPort);
 				// Setting the credentials
-				String proxyAuthUsername = descriptor.getProxyAuthUsername();
-				String proxyAuthPassword = descriptor.getProxyAuthPassword();
+				String proxyAuthUsername = pluginConfig.getProxyAuthUsername();
+				String proxyAuthPassword = pluginConfig.getProxyAuthPassword();
 				org.apache.http.auth.UsernamePasswordCredentials creds = new org.apache.http.auth.UsernamePasswordCredentials(
 						proxyAuthUsername, proxyAuthPassword);
 				credsProvider = new BasicCredentialsProvider();
