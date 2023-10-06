@@ -18,6 +18,13 @@ public class PluginConfiguration implements Serializable {
     private boolean jobStatusLogEnabled;
     private boolean jobConsoleLogEnabled;
     private boolean scmLogEnabled;
+ // Proxy settings
+    private boolean enableProxy = false;
+    private String proxyHost = "";
+    private int proxyPort = -1;
+    private boolean enableProxyAuth = false;
+    private String proxyAuthUsername = "";
+    private String proxyAuthPassword = "";
 
     public PluginConfiguration(PluginDescriptorImpl pluginDescriptor) {
         this.sumoLogicEndpoint = pluginDescriptor.getUrl();
@@ -31,6 +38,12 @@ public class PluginConfiguration implements Serializable {
         this.jobStatusLogEnabled = pluginDescriptor.isJobStatusLogEnabled();
         this.jobConsoleLogEnabled = pluginDescriptor.isJobConsoleLogEnabled();
         this.scmLogEnabled = pluginDescriptor.isScmLogEnabled();
+        this.enableProxy=pluginDescriptor.getEnableProxy();
+        this.proxyHost=pluginDescriptor.getProxyHost();
+        this.proxyPort=pluginDescriptor.getProxyPort();
+        this.enableProxyAuth=pluginDescriptor.getEnableProxyAuth();
+        this.proxyAuthUsername=pluginDescriptor.getProxyAuthUsername();
+        this.proxyAuthPassword=pluginDescriptor.getProxyAuthPassword();
     }
 
     public String getSumoLogicEndpoint() {
@@ -120,4 +133,52 @@ public class PluginConfiguration implements Serializable {
     public void setScmLogEnabled(boolean scmLogEnabled) {
         this.scmLogEnabled = scmLogEnabled;
     }
+
+	public String getProxyAuthPassword() {
+		return proxyAuthPassword;
+	}
+
+	public void setProxyAuthPassword(String proxyAuthPassword) {
+		this.proxyAuthPassword = proxyAuthPassword;
+	}
+
+	public String getProxyAuthUsername() {
+		return proxyAuthUsername;
+	}
+
+	public void setProxyAuthUsername(String proxyAuthUsername) {
+		this.proxyAuthUsername = proxyAuthUsername;
+	}
+
+	public boolean isEnableProxyAuth() {
+		return enableProxyAuth;
+	}
+
+	public void setEnableProxyAuth(boolean enableProxyAuth) {
+		this.enableProxyAuth = enableProxyAuth;
+	}
+
+	public int getProxyPort() {
+		return proxyPort;
+	}
+
+	public void setProxyPort(int proxyPort) {
+		this.proxyPort = proxyPort;
+	}
+
+	public String getProxyHost() {
+		return proxyHost;
+	}
+
+	public void setProxyHost(String proxyHost) {
+		this.proxyHost = proxyHost;
+	}
+
+	public boolean isEnableProxy() {
+		return enableProxy;
+	}
+
+	public void setEnableProxy(boolean enableProxy) {
+		this.enableProxy = enableProxy;
+	}
 }
