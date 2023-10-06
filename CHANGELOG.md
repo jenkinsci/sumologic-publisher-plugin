@@ -5,7 +5,7 @@
 Please visit [Releases](https://github.com/jenkinsci/sumologic-publisher-plugin/releases) page.
 
 ## v2.2.5
-- Fixed https://github.com/jenkinsci/sumologic-publisher-plugin/issues/39
+- Fixed "SumoUpload failure when using on agent" [bug](https://github.com/jenkinsci/sumologic-publisher-plugin/issues/39)
 
 ## v2.2.4
 - Fixed [SECURITY-3117](https://issues.jenkins.io/browse/SECURITY-3117)
