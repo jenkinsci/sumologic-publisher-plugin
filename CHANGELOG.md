@@ -4,6 +4,9 @@
 
 Please visit [Releases](https://github.com/jenkinsci/sumologic-publisher-plugin/releases) page.
 
+## v2.2.6
+Upgraded jenkins.version to 2.426.3 LTS and upgrade of dependent jars for security fixes.
+
 ## v2.2.5
 - Fixed "SumoUpload failure when using on agent" [bug](https://github.com/jenkinsci/sumologic-publisher-plugin/issues/39)
 
