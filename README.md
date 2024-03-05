@@ -20,7 +20,7 @@ Plugin can be installed and used with global configuration. Below are set of fea
 
 In `manage plugins`, search for `sumologic-publisher` version `2.2.2` and install the plugin.
 
-Tested with Jenkins version `2.361.4` and java version 11. In case of any issue, please raise a [issue](https://github.com/jenkinsci/sumologic-publisher-plugin/issues).
+Tested with Jenkins version `2.426.3` and java version 11. In case of any issue, please raise a [issue](https://github.com/jenkinsci/sumologic-publisher-plugin/issues).
 
 ## Configuration
 
