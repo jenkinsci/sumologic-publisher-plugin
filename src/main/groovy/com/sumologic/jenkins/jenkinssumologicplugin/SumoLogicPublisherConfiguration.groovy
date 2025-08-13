@@ -1,6 +1,7 @@
 package com.sumologic.jenkins.jenkinssumologicplugin
 
 import jenkins.model.Jenkins
+import hudson.util.Secret
 
 /**
 
@@ -17,7 +18,7 @@ def sumoLogic = Jenkins.get().getDescriptor(SumoBuildNotifier.class)
 
 sumoLogic.setQueryPortal('service.eu.sumologic.com')
 sumoLogic.setMetricDataPrefix('jenkinsMetricDataPrefix')
-sumoLogic.setUrl('https://<get_your_sumologic_http_source_url_here>')
+sumoLogic.setUrl(Secret.fromString('https://<get_your_sumologic_http_source_url_here>'))
 sumoLogic.setSourceCategory('jenkins')
 sumoLogic.setKeepOldConfigData(false)
 sumoLogic.setMetricDataEnabled(true)
