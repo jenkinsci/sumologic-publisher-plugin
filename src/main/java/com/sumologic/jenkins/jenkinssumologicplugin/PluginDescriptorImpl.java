@@ -202,9 +202,13 @@ public final class PluginDescriptorImpl extends BuildStepDescriptor<Publisher> {
         try {
             java.net.URL parsedUrl = new java.net.URL(url);
             String host = parsedUrl.getHost();
-            if (host == null || (!host.endsWith(".sumologic.com") && !host.equals("sumologic.com")
-                    && !host.endsWith(".sumologic.net") && !host.equals("sumologic.net"))) {
-                return FormValidation.error("Testing URLs is only allowed for sumologic.com and sumologic.net domains.");
+            if (host == null) {
+                return FormValidation.error("Host cannot be null.");
+            } else {
+                host = host.toLowerCase();
+                if (!host.endsWith(".sumologic.com") && !host.endsWith(".sumologic.net")) {
+                    return FormValidation.error("Testing URLs is only allowed for sumologic.com and sumologic.net domains.");
+                }
             }
         } catch (final java.net.MalformedURLException e) {
             return FormValidation.error("This is not a valid URL.");
