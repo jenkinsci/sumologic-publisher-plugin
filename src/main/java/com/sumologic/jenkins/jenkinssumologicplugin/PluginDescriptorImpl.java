@@ -207,7 +207,7 @@ public final class PluginDescriptorImpl extends BuildStepDescriptor<Publisher> {
             } else {
                 host = host.toLowerCase();
                 if (!host.endsWith(".sumologic.com") && !host.endsWith(".sumologic.net")) {
-                    return FormValidation.error("Testing URLs is only allowed for sumologic.com and sumologic.net domains.");
+                    return FormValidation.error("This URL is not allowed.");
                 }
             }
         } catch (final java.net.MalformedURLException e) {
