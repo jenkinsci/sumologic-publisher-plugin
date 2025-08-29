@@ -200,6 +200,20 @@ public final class PluginDescriptorImpl extends BuildStepDescriptor<Publisher> {
     public FormValidation doTestURL(@QueryParameter("url") String url) {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
         try {
+            java.net.URL parsedUrl = new java.net.URL(url);
+            String host = parsedUrl.getHost();
+            if (host == null) {
+                return FormValidation.error("Host cannot be null.");
+            } else {
+                host = host.toLowerCase();
+                if (!host.endsWith(".sumologic.com") && !host.endsWith(".sumologic.net")) {
+                    return FormValidation.error("This URL is not allowed.");
+                }
+            }
+        } catch (final java.net.MalformedURLException e) {
+            return FormValidation.error("This is not a valid URL.");
+        }
+        try {
             StatusLine statusLine = LogSender.getInstance().testHTTPUrl(url);
             if (200 == statusLine.getStatusCode()) {
                 return FormValidation.ok("Success");
