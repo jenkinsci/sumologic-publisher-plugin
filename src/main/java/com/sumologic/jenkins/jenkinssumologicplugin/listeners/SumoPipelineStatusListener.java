@@ -14,7 +14,6 @@ import hudson.model.listeners.RunListener;
 import jenkins.model.CauseOfInterruption;
 import jenkins.model.InterruptedBuildAction;
 import jenkins.model.Jenkins;
-import org.apache.commons.lang.StringUtils;
 
 import javax.annotation.Nonnull;
 import java.io.BufferedReader;
@@ -69,7 +68,7 @@ public class SumoPipelineStatusListener extends RunListener<Run> {
             BuildModel buildModel = generateJobStatusInformation(run, pluginDescriptor, isSpecificJobFlagEnabled);
 
             //For all jobs status || or for specific pipeline jobs
-            if (StringUtils.isNotEmpty(buildModel.getJobType())) {
+            if (Util.fixEmpty(buildModel.getJobType()) != null) {
                 if (pluginDescriptor.isJobStatusLogEnabled() || isSpecificJobFlagEnabled) {
                     //LOG.info("Job Status is "+buildModel.toJson());
                     logSenderHelper.sendJobStatusLogs(buildModel.toJson());

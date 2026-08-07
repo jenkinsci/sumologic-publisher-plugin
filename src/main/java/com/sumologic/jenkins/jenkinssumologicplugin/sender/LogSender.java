@@ -4,7 +4,6 @@ import com.sumologic.jenkins.jenkinssumologicplugin.PluginDescriptorImpl;
 import com.sumologic.jenkins.jenkinssumologicplugin.model.PluginConfiguration;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
-import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.CredentialsProvider;
@@ -32,6 +31,7 @@ import java.util.zip.GZIPOutputStream;
 
 import static com.sumologic.jenkins.jenkinssumologicplugin.constants.SumoConstants.CARBON_CONTENT_TYPE;
 import static com.sumologic.jenkins.jenkinssumologicplugin.constants.SumoConstants.GRAPHITE_CONTENT_TYPE;
+import hudson.Util;
 
 
 /**
@@ -191,7 +191,7 @@ public class LogSender {
                                HashMap<String, String> fields, PluginConfiguration pluginConfiguration) {
         post.addHeader("X-Sumo-Host", getHost(pluginConfiguration));
 
-        if (StringUtils.isNotBlank(sumoName)) {
+        if (Util.fixEmptyAndTrim(sumoName) != null) {
             post.addHeader("X-Sumo-Name", sumoName);
         }
 

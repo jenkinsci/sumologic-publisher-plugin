@@ -23,7 +23,6 @@ import jenkins.model.Jenkins;
 import jenkins.security.SlaveToMasterCallable;
 import jenkins.util.Timer;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringUtils;
 import org.apache.http.StatusLine;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
@@ -43,6 +42,7 @@ import java.util.logging.Logger;
 
 import static com.sumologic.jenkins.jenkinssumologicplugin.constants.SumoConstants.DATETIME_FORMATTER;
 import static hudson.init.InitMilestone.JOB_LOADED;
+import hudson.Util;
 
 /**
  * Sumo Logic plugin for Jenkins model.
@@ -127,7 +127,7 @@ public final class PluginDescriptorImpl extends BuildStepDescriptor<Publisher> {
     public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
         boolean configOk = super.configure(req, formData);
         url = Secret.fromString(formData.getString("url"));
-        queryPortal = StringUtils.isNotEmpty(formData.getString("queryPortal")) ? formData.getString("queryPortal") : "service.sumologic.com";
+        queryPortal = Util.fixEmpty(formData.getString("queryPortal")) != null ? formData.getString("queryPortal") : "service.sumologic.com";
 
         //proxy settings
         enableProxy = formData.getBoolean("enableProxy");
@@ -136,9 +136,9 @@ public final class PluginDescriptorImpl extends BuildStepDescriptor<Publisher> {
         enableProxyAuth = formData.getBoolean("enableProxyAuth");
         proxyAuthUsername = formData.getString("proxyAuthUsername");
         proxyAuthPassword = formData.getString("proxyAuthPassword");
-        sourceCategory = StringUtils.isNotEmpty(formData.getString("sourceCategory")) ? formData.getString("sourceCategory") : "jenkinsSourceCategory";
+        sourceCategory = Util.fixEmpty(formData.getString("sourceCategory")) != null ? formData.getString("sourceCategory") : "jenkinsSourceCategory";
 
-        metricDataPrefix = StringUtils.isNotEmpty(formData.getString("metricDataPrefix")) ? formData.getString("metricDataPrefix") : "jenkinsMetricDataPrefix";
+        metricDataPrefix = Util.fixEmpty(formData.getString("metricDataPrefix")) != null ? formData.getString("metricDataPrefix") : "jenkinsMetricDataPrefix";
 
         auditLogEnabled = formData.getBoolean("auditLogEnabled");
         metricDataEnabled = formData.getBoolean("metricDataEnabled");

@@ -13,7 +13,6 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 import jenkins.tasks.SimpleBuildStep;
-import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import javax.annotation.Nonnull;
@@ -23,6 +22,7 @@ import java.util.logging.Logger;
 
 import static com.sumologic.jenkins.jenkinssumologicplugin.constants.SumoConstants.GENERATION_ERROR;
 import static com.sumologic.jenkins.jenkinssumologicplugin.utility.CommonModelFactory.sendConsoleLogs;
+import hudson.Util;
 
 /**
  * This publisher will sendLogs build metadata to a Sumo Logic HTTP collector.
@@ -90,7 +90,7 @@ public class SumoBuildNotifier extends Notifier implements SimpleBuildStep {
             String json = gson.toJson(buildModel);
 
             byte[] bytes = json.getBytes();
-            if (StringUtils.isNotEmpty(buildModel.getJobType())) {
+            if (Util.fixEmpty(buildModel.getJobType()) != null) {
                 if (!descriptor.isJobStatusLogEnabled()) {
                     LOG.info("Uploading build status to sumo logic: " + json);
                     logSenderHelper.sendData(bytes);

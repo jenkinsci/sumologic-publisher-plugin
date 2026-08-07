@@ -9,13 +9,13 @@ import com.sumologic.jenkins.jenkinssumologicplugin.model.TestCaseModel;
 import com.sumologic.jenkins.jenkinssumologicplugin.model.TestCaseResultModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.sumologic.jenkins.jenkinssumologicplugin.constants.SumoConstants.*;
+import hudson.Util;
 
 /**
  * Sumo Logic plugin for Jenkins model.
@@ -91,7 +91,7 @@ public class LogSenderHelper {
     public void sendConsoleLogs(String data, String jobName, int buildNumber, String stageName) {
 
         String sourceName = jobName + "#" + buildNumber;
-        if (StringUtils.isNotEmpty(stageName)) {
+        if (Util.fixEmpty(stageName) != null) {
             sourceName = sourceName + "#" + stageName;
         }
         LogSender.getInstance().sendLogs(data.getBytes(), sourceName);
@@ -200,7 +200,7 @@ public class LogSenderHelper {
     }
 
     private static String format(String data) {
-        if (StringUtils.isNotEmpty(data)) {
+        if (Util.fixEmpty(data) != null) {
             data = data.replace("{", "(");
             return data.replace("}", ")");
         }

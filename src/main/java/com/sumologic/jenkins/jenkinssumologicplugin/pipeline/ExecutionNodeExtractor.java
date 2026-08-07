@@ -3,7 +3,6 @@ package com.sumologic.jenkins.jenkinssumologicplugin.pipeline;
 
 import com.cloudbees.workflow.rest.external.ChunkVisitor;
 import com.sumologic.jenkins.jenkinssumologicplugin.constants.ParallelNodeTypeEnum;
-import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.workflow.actions.WorkspaceAction;
 import org.jenkinsci.plugins.workflow.cps.nodes.StepEndNode;
 import org.jenkinsci.plugins.workflow.cps.nodes.StepStartNode;
@@ -24,6 +23,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static com.sumologic.jenkins.jenkinssumologicplugin.constants.SumoConstants.JENKINS_MAIN;
+import hudson.Util;
 
 /**
  * Sumo Logic plugin for Jenkins model.
@@ -70,7 +70,7 @@ public class ExecutionNodeExtractor extends ChunkVisitor {
                 if (workspaceAction != null) {
                     execNodeName = workspaceAction.getNode();
                     execNodeStartId = nodeStep.getId();
-                    if (StringUtils.isEmpty(execNodeName)) {
+                    if (Util.fixEmpty(execNodeName) == null) {
                         execNodeName = JENKINS_MAIN;
                     }
                 }

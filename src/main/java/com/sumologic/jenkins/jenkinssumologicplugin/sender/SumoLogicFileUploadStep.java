@@ -9,8 +9,6 @@ import hudson.model.TaskListener;
 import hudson.remoting.VirtualChannel;
 import jenkins.MasterToSlaveFileCallable;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.workflow.steps.*;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -21,6 +19,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
+import hudson.Util;
 
 @SuppressFBWarnings("DM_DEFAULT_ENCODING")
 public class SumoLogicFileUploadStep extends Step {
@@ -139,7 +138,7 @@ public class SumoLogicFileUploadStep extends Step {
 
         public void sendTextData(String text, String sourceName, HashMap<String, String> fields) {
             List<String> lines = new ArrayList<>();
-            if (StringUtils.isNotEmpty(text)) {
+            if (Util.fixEmpty(text) != null) {
                 lines.add(text);
                 logSenderHelper.sendFilesData(lines, sourceName, fields);
             }
@@ -245,7 +244,7 @@ public class SumoLogicFileUploadStep extends Step {
                 sendFilesData(localFile);
             } else if (localFile.isDirectory()) {
                 File[] files = localFile.listFiles();
-                if (ArrayUtils.isNotEmpty(files)) {
+                if (files != null && files.length > 0) {
                     for (File dataFile : files) {
                         sendFilesData(dataFile);
                     }

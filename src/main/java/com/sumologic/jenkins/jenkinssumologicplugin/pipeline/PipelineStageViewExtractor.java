@@ -8,7 +8,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.console.AnnotatedLargeText;
 import hudson.model.Result;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.workflow.actions.ErrorAction;
 import org.jenkinsci.plugins.workflow.actions.LogAction;
 import org.jenkinsci.plugins.workflow.flow.FlowExecution;
@@ -28,6 +27,7 @@ import java.util.stream.Collectors;
 import static com.sumologic.jenkins.jenkinssumologicplugin.constants.SumoConstants.DATETIME_FORMATTER;
 import static com.sumologic.jenkins.jenkinssumologicplugin.constants.SumoConstants.JENKINS_MAIN;
 import static com.sumologic.jenkins.jenkinssumologicplugin.sender.LogSenderHelper.sendPipelineStages;
+import hudson.Util;
 
 @SuppressFBWarnings({"DM_DEFAULT_ENCODING", "RV_RETURN_VALUE_IGNORED"})
 public class PipelineStageViewExtractor {
@@ -57,7 +57,7 @@ public class PipelineStageViewExtractor {
                 if (CollectionUtils.isNotEmpty(stageFlowNodes)) {
                     stageFlowNodes.forEach(atomFlowNodeExt -> {
                         String data = setStepDetails(atomFlowNodeExt, visitor.getWorkspaceNodes());
-                        if (StringUtils.isNotBlank(data)) {
+                        if (Util.fixEmptyAndTrim(data) != null) {
                             steps.add(data);
                         }
                     });
@@ -171,7 +171,7 @@ public class PipelineStageViewExtractor {
                         StringWriter writer = new StringWriter();
 
                         logText.writeLogTo(0, writer);
-                        if (StringUtils.isNotEmpty(writer.toString())) {
+                        if (Util.fixEmpty(writer.toString()) != null) {
                             messages.add(writer.toString());
                         }
                         writer.close();
