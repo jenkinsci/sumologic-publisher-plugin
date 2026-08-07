@@ -1,7 +1,7 @@
 package com.sumologic.jenkins.jenkinssumologicplugin.constants;
 
 import com.sumologic.jenkins.jenkinssumologicplugin.sender.LogSender;
-import org.apache.commons.lang.time.FastDateFormat;
+import com.sumologic.jenkins.jenkinssumologicplugin.utility.SumoDateFormat;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -26,8 +26,8 @@ public class SumoConstants {
     public static final String MAIN = "master";
     public static final String JENKINS_MAIN = "(master)";
 
-    public static final FastDateFormat DATETIME_FORMATTER
-            = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss,SSS ZZZZ");
+    public static final SumoDateFormat DATETIME_FORMATTER
+            = new SumoDateFormat("yyyy-MM-dd HH:mm:ss,SSS xxx");
 
     public static final String GENERATION_ERROR = "Job Status Generation ended with exception as ";
 

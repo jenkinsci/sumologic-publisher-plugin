@@ -8,7 +8,6 @@ import hudson.EnvVars;
 import hudson.Extension;
 import hudson.model.Queue;
 import hudson.model.Run;
-import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.workflow.actions.LabelAction;
 import org.jenkinsci.plugins.workflow.actions.StageAction;
 import org.jenkinsci.plugins.workflow.actions.ThreadNameAction;
@@ -25,6 +24,7 @@ import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
+import hudson.Util;
 
 @SuppressFBWarnings("DM_DEFAULT_ENCODING")
 public class SdoEventDeliveryStep extends Step {
@@ -113,7 +113,7 @@ public class SdoEventDeliveryStep extends Step {
                 Gson gson = new Gson();
                 envVars.forEach((key, value) -> {
                     if (key.toLowerCase().equals("sumo_event_type")) {
-                        if (StringUtils.isBlank(eventType)) {
+                        if (Util.fixEmptyAndTrim(eventType) == null) {
                             data.put("event_type", value);
                         } else {
                             data.put("event_type", eventType);

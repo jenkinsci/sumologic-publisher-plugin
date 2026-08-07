@@ -17,7 +17,6 @@ import jenkins.metrics.impl.TimeInQueueAction;
 import jenkins.model.CauseOfInterruption;
 import jenkins.model.InterruptedBuildAction;
 import jenkins.model.Jenkins;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.BufferedReader;
 import java.lang.reflect.Method;
@@ -33,7 +32,6 @@ import java.util.regex.Pattern;
 import static com.sumologic.jenkins.jenkinssumologicplugin.constants.SumoConstants.*;
 import static com.sumologic.jenkins.jenkinssumologicplugin.sender.LogSenderHelper.sendTestResult;
 import static com.sumologic.jenkins.jenkinssumologicplugin.utility.TestCaseReport.getTestCaseReport;
-import static org.apache.commons.lang.reflect.MethodUtils.getAccessibleMethod;
 
 /**
  * Sumo Logic plugin for Jenkins model.
@@ -87,7 +85,7 @@ public class CommonModelFactory {
 
         TestCaseModel testCaseModel = getTestResultSummary(buildInfo);
         if (testCaseModel != null && (pluginDescriptor.isJobStatusLogEnabled() || isSpecificJobFlagEnabled)
-                && StringUtils.isNotEmpty(buildModel.getJobType())) {
+                && Util.fixEmpty(buildModel.getJobType()) != null) {
             sendTestResult(testCaseModel, buildModel);
             testCaseModel.setTestResults(null);
             buildModel.setTestResult(testCaseModel);
@@ -205,7 +203,7 @@ public class CommonModelFactory {
                 }
             }
         }
-        return StringUtils.join(causes, COMMA_SEPARATOR);
+        return String.join(COMMA_SEPARATOR, causes);
     }
 
 
@@ -260,7 +258,7 @@ public class CommonModelFactory {
                 BuildModel.setNodeName(builtOnStr);
             }
         } else {
-            if (executor != null && StringUtils.isEmpty(executor.getOwner().getName())) {
+            if (executor != null && Util.fixEmpty(executor.getOwner().getName()) == null) {
                 BuildModel.setNodeName(MAIN);
             }
         }
@@ -413,7 +411,7 @@ public class CommonModelFactory {
                     String monitorName = key.split("\\.")[2];
                     String monitorData = null;
                     if (value != null) {
-                        Method method = getAccessibleMethod(value.getClass(), "toHtml", new Class<?>[0]);
+                        Method method = getToHtmlMethod(value.getClass());
                         if (method != null) {
                             try {
                                 monitorData = (String) method.invoke(value, new Object[0]);
@@ -534,4 +532,18 @@ public class CommonModelFactory {
             listener.error(errorMessage);
         }
     }
+
+    /**
+     * Looks up a public no-arg {@code toHtml()} on the given type, replacing Commons Lang's
+     * {@code MethodUtils.getAccessibleMethod}. Returns null when the method is absent, which is what
+     * the caller already checks for.
+     */
+    private static Method getToHtmlMethod(Class<?> type) {
+        try {
+            return type.getMethod("toHtml");
+        } catch (NoSuchMethodException e) {
+            return null;
+        }
+    }
+
 }
