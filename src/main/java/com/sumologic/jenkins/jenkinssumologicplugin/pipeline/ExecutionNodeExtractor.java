@@ -1,16 +1,16 @@
 package com.sumologic.jenkins.jenkinssumologicplugin.pipeline;
 
 
-import com.cloudbees.workflow.rest.external.ChunkVisitor;
 import com.sumologic.jenkins.jenkinssumologicplugin.constants.ParallelNodeTypeEnum;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.workflow.actions.WorkspaceAction;
 import org.jenkinsci.plugins.workflow.cps.nodes.StepEndNode;
 import org.jenkinsci.plugins.workflow.cps.nodes.StepStartNode;
+import org.jenkinsci.plugins.workflow.graph.BlockEndNode;
 import org.jenkinsci.plugins.workflow.graph.FlowNode;
 import org.jenkinsci.plugins.workflow.graph.FlowStartNode;
 import org.jenkinsci.plugins.workflow.graphanalysis.ForkScanner;
-import org.jenkinsci.plugins.workflow.job.WorkflowRun;
+import org.jenkinsci.plugins.workflow.graphanalysis.StandardChunkVisitor;
 import org.jenkinsci.plugins.workflow.steps.StepDescriptor;
 
 import javax.annotation.CheckForNull;
@@ -32,15 +32,14 @@ import static com.sumologic.jenkins.jenkinssumologicplugin.constants.SumoConstan
  * <p>
  * Created by Sourabh Jain on 5/2019.
  */
-public class ExecutionNodeExtractor extends ChunkVisitor {
+public class ExecutionNodeExtractor extends StandardChunkVisitor {
     private static final Logger LOG = Logger.getLogger(ExecutionNodeExtractor.class.getName());
     private final Map<String, String> workspaceNodes = new HashMap<>();
     private final Map<String, Set<String>> parallelNodes = new HashMap<>();
     private String execNodeName = null;
     private String execNodeStartId = null;
 
-    ExecutionNodeExtractor(@Nonnull WorkflowRun run) {
-        super(run);
+    ExecutionNodeExtractor() {
     }
 
     Map<String, String> getWorkspaceNodes() {
@@ -49,6 +48,15 @@ public class ExecutionNodeExtractor extends ChunkVisitor {
 
     Map<String, Set<String>> getParallelNodes() {
         return parallelNodes;
+    }
+
+    @Override
+    public void chunkEnd(@Nonnull FlowNode endNode, @CheckForNull FlowNode afterBlock, @Nonnull ForkScanner scanner) {
+        super.chunkEnd(endNode, afterBlock, scanner);
+        // the last node before a labelled node that is not a block end is also visited as an atom node
+        if (!(endNode instanceof BlockEndNode)) {
+            atomNode(null, endNode, afterBlock, scanner);
+        }
     }
 
     @Override

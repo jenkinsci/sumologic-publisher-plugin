@@ -110,10 +110,13 @@
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>subversion</artifactId>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.jenkins-ci.plugins.pipeline-stage-view/pipeline-rest-api -->
         <dependency>
-            <groupId>org.jenkins-ci.plugins.pipeline-stage-view</groupId>
-            <artifactId>pipeline-rest-api</artifactId>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-cps</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-job</artifactId>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.jenkins-ci.plugins/apache-httpcomponents-client-4-api -->
         <dependency>
@@ -237,6 +240,16 @@
 <dependency>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>ldap</artifactId>
+    <scope>test</scope>
+</dependency>
+<dependency>
+    <groupId>org.jenkins-ci.plugins</groupId>
+    <artifactId>pipeline-stage-step</artifactId>
+    <scope>test</scope>
+</dependency>
+<dependency>
+    <groupId>org.jenkins-ci.plugins.workflow</groupId>
+    <artifactId>workflow-basic-steps</artifactId>
     <scope>test</scope>
 </dependency>
     </dependencies>
