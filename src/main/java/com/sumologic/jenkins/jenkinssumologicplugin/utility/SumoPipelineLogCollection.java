@@ -7,7 +7,7 @@ import hudson.model.Run;
 import org.jenkinsci.plugins.workflow.steps.*;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
@@ -68,7 +68,7 @@ public class SumoPipelineLogCollection extends Step {
          * {@inheritDoc}
          */
         @Override
-        public void stop(@Nonnull Throwable cause) {
+        public void stop(@NonNull Throwable cause) {
             getContext().onFailure(cause);
         }
     }
@@ -79,7 +79,7 @@ public class SumoPipelineLogCollection extends Step {
     @Extension(optional = true)
     public static class StepDescriptorImpl extends StepDescriptor {
 
-        @Nonnull
+        @NonNull
         @Override
         public String getDisplayName() {
             return "SumoPipelineLogCollection";

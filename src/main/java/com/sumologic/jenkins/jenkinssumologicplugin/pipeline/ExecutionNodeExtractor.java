@@ -13,8 +13,8 @@ import org.jenkinsci.plugins.workflow.graphanalysis.ForkScanner;
 import org.jenkinsci.plugins.workflow.graphanalysis.StandardChunkVisitor;
 import org.jenkinsci.plugins.workflow.steps.StepDescriptor;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +51,7 @@ public class ExecutionNodeExtractor extends StandardChunkVisitor {
     }
 
     @Override
-    public void chunkEnd(@Nonnull FlowNode endNode, @CheckForNull FlowNode afterBlock, @Nonnull ForkScanner scanner) {
+    public void chunkEnd(@NonNull FlowNode endNode, @CheckForNull FlowNode afterBlock, @NonNull ForkScanner scanner) {
         super.chunkEnd(endNode, afterBlock, scanner);
         // the last node before a labelled node that is not a block end is also visited as an atom node
         if (!(endNode instanceof BlockEndNode)) {
@@ -60,7 +60,7 @@ public class ExecutionNodeExtractor extends StandardChunkVisitor {
     }
 
     @Override
-    public void atomNode(@CheckForNull FlowNode before, @Nonnull FlowNode atomNode, @CheckForNull FlowNode after, @Nonnull ForkScanner scan) {
+    public void atomNode(@CheckForNull FlowNode before, @NonNull FlowNode atomNode, @CheckForNull FlowNode after, @NonNull ForkScanner scan) {
         try {
             findWhereCurrentNodeIsExecuting(atomNode);
             findParallelNode(scan, atomNode);
@@ -91,7 +91,7 @@ public class ExecutionNodeExtractor extends StandardChunkVisitor {
         }
     }
 
-    private void findParallelNode(@Nonnull ForkScanner scan, FlowNode atomNode) {
+    private void findParallelNode(@NonNull ForkScanner scan, FlowNode atomNode) {
         if (ParallelNodeTypeEnum.NORMAL.toString().equals(String.valueOf(scan.getCurrentType()))
                 && ParallelNodeTypeEnum.PARALLEL_BRANCH_START.toString().equals(String.valueOf(scan.getNextType()))
                 && scan.getCurrentParallelStartNode() != null) {

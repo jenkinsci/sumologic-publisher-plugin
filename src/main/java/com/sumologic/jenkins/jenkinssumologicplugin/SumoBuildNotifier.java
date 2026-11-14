@@ -5,7 +5,6 @@ import com.sumologic.jenkins.jenkinssumologicplugin.integration.SearchAction;
 import com.sumologic.jenkins.jenkinssumologicplugin.model.BuildModel;
 import com.sumologic.jenkins.jenkinssumologicplugin.model.ModelFactory;
 import com.sumologic.jenkins.jenkinssumologicplugin.sender.LogSenderHelper;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.*;
@@ -16,7 +15,7 @@ import jenkins.tasks.SimpleBuildStep;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,7 +30,6 @@ import static com.sumologic.jenkins.jenkinssumologicplugin.utility.CommonModelFa
  * <p>
  * Modified by Sourabh Jain 5/2019
  */
-@SuppressFBWarnings("DM_DEFAULT_ENCODING")
 public class SumoBuildNotifier extends Notifier implements SimpleBuildStep {
 
     private final static Logger LOG = Logger.getLogger(SumoBuildNotifier.class.getName());
@@ -67,7 +65,7 @@ public class SumoBuildNotifier extends Notifier implements SimpleBuildStep {
     }
 
     @Override
-    public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath filePath, @Nonnull Launcher launcher, @Nonnull TaskListener taskListener) {
+    public void perform(@NonNull Run<?, ?> run, @NonNull FilePath filePath, @NonNull Launcher launcher, @NonNull TaskListener taskListener) {
         try {
             send(run, taskListener);
         } catch (Exception e) {

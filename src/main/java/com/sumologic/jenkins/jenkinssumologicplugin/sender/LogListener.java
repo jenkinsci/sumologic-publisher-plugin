@@ -5,7 +5,7 @@ import hudson.console.ConsoleLogFilter;
 import hudson.model.Computer;
 import hudson.model.Run;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.OutputStream;
 import java.io.Serializable;
 
@@ -58,7 +58,7 @@ public class LogListener extends ConsoleLogFilter implements Serializable {
     }
 
     @Override
-    public OutputStream decorateLogger(@Nonnull Computer computer, OutputStream logger) {
+    public OutputStream decorateLogger(@NonNull Computer computer, OutputStream logger) {
         return logger;
     }
 }

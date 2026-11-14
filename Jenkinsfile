@@ -1,8 +1,9 @@
-def minimumLTS = "2.426.3"
-def configurations = [
-    [ platform: "windows", jdk: "11", jenkins: minimumLTS ],
-    // Linux 11
-    [ platform: "linux", jdk: "11", jenkins: minimumLTS ],
-]
-
-buildPlugin(configurations: configurations)
+/*
+ See the documentation for more options:
+ https://github.com/jenkins-infra/pipeline-library/
+*/
+buildPlugin(
+  configurations: [
+    [platform: 'linux', jdk: 25],
+    [platform: 'windows', jdk: 25],
+])

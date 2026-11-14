@@ -3,7 +3,6 @@ package com.sumologic.jenkins.jenkinssumologicplugin.sdo;
 import com.google.gson.Gson;
 import com.sumologic.jenkins.jenkinssumologicplugin.sender.LogSenderHelper;
 import com.sumologic.jenkins.jenkinssumologicplugin.utility.CommonModelFactory;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.model.Queue;
@@ -20,13 +19,12 @@ import org.jenkinsci.plugins.workflow.steps.*;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
 
-@SuppressFBWarnings("DM_DEFAULT_ENCODING")
 public class SdoEventDeliveryStep extends Step {
 
     private String eventType;
@@ -82,7 +80,7 @@ public class SdoEventDeliveryStep extends Step {
             return "SumoSDOEvent";
         }
 
-        @Nonnull
+        @NonNull
         @Override
         public String getDisplayName() {
             return "Upload Events specific to Software Delivery Optimization Solution to Sumo Logic.";
@@ -96,7 +94,7 @@ public class SdoEventDeliveryStep extends Step {
         protected final transient SdoEventDeliveryStep step;
         private static final LogSenderHelper logSenderHelper = LogSenderHelper.getInstance();
 
-        protected Execution(SdoEventDeliveryStep sdoEventDeliveryStep, @Nonnull StepContext context) {
+        protected Execution(SdoEventDeliveryStep sdoEventDeliveryStep, @NonNull StepContext context) {
             super(context);
             this.step = sdoEventDeliveryStep;
         }

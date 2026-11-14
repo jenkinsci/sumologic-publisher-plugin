@@ -5,7 +5,7 @@
         <!-- https://mvnrepository.com/artifact/org.jenkins-ci.plugins/plugin -->
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>4.66</version>
+        <version>6.2250.va_d01d559a_209</version>
         <relativePath />
     </parent>
     <artifactId>sumologic-publisher</artifactId>
@@ -23,7 +23,9 @@
     </licenses>
 
     <properties>
-        <jenkins.version>2.426.3</jenkins.version>
+        <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
+        <jenkins.baseline>2.568</jenkins.baseline>
+        <jenkins.version>${jenkins.baseline}.3</jenkins.version>
     </properties>
     <developers>
         <developer>
@@ -63,31 +65,16 @@
         </pluginRepository>
     </pluginRepositories>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.2.0</version>
-                <configuration>
-                    <source>8</source>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.10.1</version>
+            <groupId>io.jenkins.plugins</groupId>
+            <artifactId>gson-api</artifactId>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.jenkins-ci.main/maven-plugin -->
         <dependency>
             <groupId>org.jenkins-ci.main</groupId>
             <artifactId>maven-plugin</artifactId>
-            <version>3.23</version>
+            <version>3.28</version>
         </dependency>
         <dependency>
             <groupId>javax.annotation</groupId>
@@ -155,33 +142,14 @@
             <artifactId>symbol-annotation</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.checkerframework</groupId>
-            <artifactId>checker-qual</artifactId>
-            <version>3.42.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.errorprone</groupId>
-            <artifactId>error_prone_annotations</artifactId>
-            <version>2.18.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>mailer</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>apache-httpcomponents-client-4-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>trilead-api</artifactId>
         </dependency>
         <!--Test Dependency-->
         <!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>3.5.13</version>
             <scope>test</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
@@ -197,14 +165,8 @@
             <artifactId>junit</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.18.0</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-net</groupId>
-            <artifactId>commons-net</artifactId>
-            <version>3.10.0</version>
+            <groupId>io.jenkins.plugins</groupId>
+            <artifactId>commons-lang3-api</artifactId>
         </dependency>
 <dependency>
     <groupId>org.jenkins-ci.plugins.workflow</groupId>
@@ -225,16 +187,6 @@
 <dependency>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>scm-api</artifactId>
-</dependency>
-<dependency>
-    <groupId>org.apache.sshd</groupId>
-    <artifactId>sshd-common</artifactId>
-    <version>2.12.0</version>
-</dependency>
-<dependency>
-    <groupId>org.apache.sshd</groupId>
-    <artifactId>sshd-core</artifactId>
-    <version>2.12.0</version>
 </dependency>
 
 <dependency>
@@ -257,8 +209,8 @@
     <dependencies>
         <dependency>
             <groupId>io.jenkins.tools.bom</groupId>
-            <artifactId>bom-2.426.x</artifactId>
-            <version>2805.v4398b_43dfc18</version>
+            <artifactId>bom-${jenkins.baseline}.x</artifactId>
+            <version>7349.vd0a_cb_6c87a_31</version>
             <scope>import</scope>
             <type>pom</type>
         </dependency>

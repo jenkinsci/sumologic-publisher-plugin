@@ -29,7 +29,7 @@ import static com.sumologic.jenkins.jenkinssumologicplugin.constants.SumoConstan
 import static com.sumologic.jenkins.jenkinssumologicplugin.constants.SumoConstants.JENKINS_MAIN;
 import static com.sumologic.jenkins.jenkinssumologicplugin.sender.LogSenderHelper.sendPipelineStages;
 
-@SuppressFBWarnings({"DM_DEFAULT_ENCODING", "RV_RETURN_VALUE_IGNORED"})
+@SuppressFBWarnings("RV_RETURN_VALUE_IGNORED")
 public class PipelineStageViewExtractor {
     private static final LogSenderHelper logSenderHelper = LogSenderHelper.getInstance();
     private static final Logger LOG = Logger.getLogger(PipelineStageViewExtractor.class.getName());

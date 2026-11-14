@@ -1,7 +1,6 @@
 package com.sumologic.jenkins.jenkinssumologicplugin.sender;
 
 import com.google.gson.Gson;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.Run;
@@ -15,14 +14,13 @@ import org.jenkinsci.plugins.workflow.steps.*;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
-@SuppressFBWarnings("DM_DEFAULT_ENCODING")
 public class SumoLogicFileUploadStep extends Step {
 
     private String file;
@@ -118,7 +116,7 @@ public class SumoLogicFileUploadStep extends Step {
             return "SumoUpload";
         }
 
-        @Nonnull
+        @NonNull
         @Override
         public String getDisplayName() {
             return "Upload files or Text to Sumo Logic HTTP source as provided in Sumo Logic Publisher Configuration.";
