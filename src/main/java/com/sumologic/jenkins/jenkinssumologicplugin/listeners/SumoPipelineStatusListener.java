@@ -16,7 +16,7 @@ import jenkins.model.InterruptedBuildAction;
 import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
@@ -57,7 +57,7 @@ public class SumoPipelineStatusListener extends RunListener<Run> {
     }
 
     @Override
-    public void onCompleted(Run run, @Nonnull TaskListener listener) {
+    public void onCompleted(Run run, @NonNull TaskListener listener) {
         try {
             PluginDescriptorImpl pluginDescriptor = PluginDescriptorImpl.getInstance();
             /*

@@ -1,6 +1,5 @@
 package com.sumologic.jenkins.jenkinssumologicplugin.pipeline;
 
-import com.cloudbees.workflow.rest.external.*;
 import com.sumologic.jenkins.jenkinssumologicplugin.model.BuildModel;
 import com.sumologic.jenkins.jenkinssumologicplugin.model.PipelineStageModel;
 import com.sumologic.jenkins.jenkinssumologicplugin.sender.LogSenderHelper;
@@ -9,6 +8,7 @@ import hudson.console.AnnotatedLargeText;
 import hudson.model.Result;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.plugins.workflow.actions.ArgumentsAction;
 import org.jenkinsci.plugins.workflow.actions.ErrorAction;
 import org.jenkinsci.plugins.workflow.actions.LogAction;
 import org.jenkinsci.plugins.workflow.flow.FlowExecution;
@@ -29,7 +29,7 @@ import static com.sumologic.jenkins.jenkinssumologicplugin.constants.SumoConstan
 import static com.sumologic.jenkins.jenkinssumologicplugin.constants.SumoConstants.JENKINS_MAIN;
 import static com.sumologic.jenkins.jenkinssumologicplugin.sender.LogSenderHelper.sendPipelineStages;
 
-@SuppressFBWarnings({"DM_DEFAULT_ENCODING", "RV_RETURN_VALUE_IGNORED"})
+@SuppressFBWarnings("RV_RETURN_VALUE_IGNORED")
 public class PipelineStageViewExtractor {
     private static final LogSenderHelper logSenderHelper = LogSenderHelper.getInstance();
     private static final Logger LOG = Logger.getLogger(PipelineStageViewExtractor.class.getName());
@@ -41,60 +41,62 @@ public class PipelineStageViewExtractor {
      * @param buildModel  - the jenkins plugin build model
      */
     public static void extractPipelineStages(WorkflowRun workflowRun, BuildModel buildModel) {
-        List<PipelineStageModel> pipelineStageModels = new ArrayList<>();
-        RunExt runExt = RunExt.create(workflowRun);
-        FlowExecution execution = workflowRun.getExecution();
-        ExecutionNodeExtractor visitor = new ExecutionNodeExtractor(workflowRun);
-        if (execution != null) {
-            ForkScanner.visitSimpleChunks(execution.getCurrentHeads(), visitor, new LabelledChunkFinder());
-        }
-
-        if (Objects.nonNull(runExt) && CollectionUtils.isNotEmpty(runExt.getStages())) {
-            for (StageNodeExt stageNodeExt : runExt.getStages()) {
-                List<String> steps = new ArrayList<>();
-                PipelineStageModel pipelineStageModel = setStageDetails(stageNodeExt, visitor.getWorkspaceNodes());
-                List<AtomFlowNodeExt> stageFlowNodes = stageNodeExt.getStageFlowNodes();
-                if (CollectionUtils.isNotEmpty(stageFlowNodes)) {
-                    stageFlowNodes.forEach(atomFlowNodeExt -> {
-                        String data = setStepDetails(atomFlowNodeExt, visitor.getWorkspaceNodes());
-                        if (StringUtils.isNotBlank(data)) {
-                            steps.add(data);
-                        }
-                    });
-                    if (CollectionUtils.isNotEmpty(steps)) {
-                        pipelineStageModel.setSteps(steps);
-                    }
-                }
-                if (visitor.getParallelNodes().containsKey(stageNodeExt.getId())) {
-                    pipelineStageModel.setParallelStage(visitor.getParallelNodes().get(stageNodeExt.getId()));
-                }
-                pipelineStageModels.add(pipelineStageModel);
-            }
-        }
-        AtomicInteger counter = new AtomicInteger(1);
-        pipelineStageModels.forEach(pipelineStageModel -> {
-            pipelineStageModel.setId(counter.getAndIncrement());
-        });
+        List<PipelineStageModel> pipelineStageModels = getPipelineStages(workflowRun);
         if (CollectionUtils.isNotEmpty(pipelineStageModels)) {
             sendPipelineStages(pipelineStageModels, buildModel);
         }
     }
 
-    private static PipelineStageModel setStageDetails(FlowNodeExt stageExt, Map<String, String> executionNodes) {
-        final PipelineStageModel pipelineStageDTO = new PipelineStageModel();
-        pipelineStageDTO.setStageId(stageExt.getId());
-        pipelineStageDTO.setName(stageExt.getName());
-        pipelineStageDTO.setStatus(convertToResult(stageExt.getStatus()));
-        pipelineStageDTO.setStartTime(DATETIME_FORMATTER.format(stageExt.getStartTimeMillis()));
-        pipelineStageDTO.setDuration(stageExt.getDurationMillis() / 1000f);
-        pipelineStageDTO.setPauseDuration(stageExt.getPauseDurationMillis() / 1000f);
-        pipelineStageDTO.setArguments(stageExt.getParameterDescription());
-        pipelineStageDTO.setExecutionNode(executionNodes.getOrDefault(stageExt.getId(), JENKINS_MAIN));
+    static List<PipelineStageModel> getPipelineStages(WorkflowRun workflowRun) {
+        List<PipelineStageModel> pipelineStageModels = new ArrayList<>();
+        FlowExecution execution = workflowRun.getExecution();
+        if (execution == null) {
+            return pipelineStageModels;
+        }
+        ExecutionNodeExtractor visitor = new ExecutionNodeExtractor();
+        ForkScanner.visitSimpleChunks(execution.getCurrentHeads(), visitor, new LabelledChunkFinder());
 
-        ErrorExt error = stageExt.getError();
+        for (PipelineStageCollector.Node stage : PipelineStageCollector.collectStages(execution)) {
+            List<String> steps = new ArrayList<>();
+            PipelineStageModel pipelineStageModel = setStageDetails(stage, visitor.getWorkspaceNodes());
+            stage.steps.forEach(step -> {
+                String data = setStepDetails(step, visitor.getWorkspaceNodes());
+                if (StringUtils.isNotBlank(data)) {
+                    steps.add(data);
+                }
+            });
+            if (CollectionUtils.isNotEmpty(steps)) {
+                pipelineStageModel.setSteps(steps);
+            }
+            String stageId = stage.node.getId();
+            if (visitor.getParallelNodes().containsKey(stageId)) {
+                pipelineStageModel.setParallelStage(visitor.getParallelNodes().get(stageId));
+            }
+            pipelineStageModels.add(pipelineStageModel);
+        }
+        AtomicInteger counter = new AtomicInteger(1);
+        pipelineStageModels.forEach(pipelineStageModel -> {
+            pipelineStageModel.setId(counter.getAndIncrement());
+        });
+        return pipelineStageModels;
+    }
+
+    private static PipelineStageModel setStageDetails(PipelineStageCollector.Node stage, Map<String, String> executionNodes) {
+        final PipelineStageModel pipelineStageDTO = new PipelineStageModel();
+        FlowNode node = stage.node;
+        pipelineStageDTO.setStageId(node.getId());
+        pipelineStageDTO.setName(node.getDisplayName());
+        pipelineStageDTO.setStatus(stage.status);
+        pipelineStageDTO.setStartTime(DATETIME_FORMATTER.format(stage.startTime));
+        pipelineStageDTO.setDuration(stage.duration / 1000f);
+        pipelineStageDTO.setPauseDuration(stage.pause / 1000f);
+        pipelineStageDTO.setArguments(ArgumentsAction.getStepArgumentsAsString(node));
+        pipelineStageDTO.setExecutionNode(executionNodes.getOrDefault(node.getId(), JENKINS_MAIN));
+
+        ErrorAction error = stage.error;
         if (error != null) {
             String errorMessage;
-            errorMessage = "StageErrorType - " + error.getType() + "," + "StageErrorMessage - " + error.getMessage() + "";
+            errorMessage = "StageErrorType - " + errorType(error) + "," + "StageErrorMessage - " + errorMessage(error) + "";
             errorMessage = errorMessage.replace("{", "(");
             errorMessage = errorMessage.replace("}", ")");
             pipelineStageDTO.setError(errorMessage);
@@ -102,41 +104,55 @@ public class PipelineStageViewExtractor {
         return pipelineStageDTO;
     }
 
-    private static String setStepDetails(FlowNodeExt stepExt, Map<String, String> executionNodes) {
+    private static String setStepDetails(PipelineStageCollector.Node step, Map<String, String> executionNodes) {
         StringBuilder stringBuilder = new StringBuilder();
+        FlowNode node = step.node;
 
-        stringBuilder.append("StepName - ").append(stepExt.getName()).append(",")
-                .append("StepStatus - ").append(convertToResult(stepExt.getStatus())).append(",")
-                .append("StepDuration - ").append(stepExt.getDurationMillis() / 1000f).append(",")
-                .append("StepArguments - ").append(stepExt.getParameterDescription()).append(",")
-                .append("StepExecutedOn - ").append(executionNodes.getOrDefault(stepExt.getId(), JENKINS_MAIN));
+        stringBuilder.append("StepName - ").append(node.getDisplayName()).append(",")
+                .append("StepStatus - ").append(step.status).append(",")
+                .append("StepDuration - ").append(step.duration / 1000f).append(",")
+                .append("StepArguments - ").append(ArgumentsAction.getStepArgumentsAsString(node)).append(",")
+                .append("StepExecutedOn - ").append(executionNodes.getOrDefault(node.getId(), JENKINS_MAIN));
 
-        ErrorExt error = stepExt.getError();
+        ErrorAction error = step.error;
         if (error != null) {
-            stringBuilder.append(",StepErrorType - ").append(error.getType()).append(",")
-                    .append("StepErrorMessage - ").append(error.getMessage());
+            stringBuilder.append(",StepErrorType - ").append(errorType(error)).append(",")
+                    .append("StepErrorMessage - ").append(errorMessage(error));
         }
 
-        stringBuilder.append(",StepPauseDuration - ").append(stepExt.getPauseDurationMillis() / 1000f).append(",")
-                .append("StepId - ").append(stepExt.getId());
+        stringBuilder.append(",StepPauseDuration - ").append(step.pause / 1000f).append(",")
+                .append("StepId - ").append(node.getId());
 
-        String step = stringBuilder.toString();
-        step = step.replace("{", "(");
-        step = step.replace("}", ")");
-        return step;
+        String stepDetails = stringBuilder.toString();
+        stepDetails = stepDetails.replace("{", "(");
+        stepDetails = stepDetails.replace("}", ")");
+        return stepDetails;
     }
 
-    private static String convertToResult(StatusExt status) {
-        if (status == null) {
-            return "UNKNOWN";
+    @SuppressFBWarnings(value = "RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE",
+            justification = "Deserialization can leave a null Throwable")
+    private static String errorType(ErrorAction error) {
+        Throwable throwable = error.getError();
+        if (throwable == null) {
+            // rare cases, for example serialization problems
+            return "No type: null Throwable on error";
         }
-        switch (status) {
-            case FAILED:
-                return Result.FAILURE.toString();
-            case NOT_EXECUTED:
-                return Result.NOT_BUILT.toString();
-            default:
-                return status.toString();
+        return throwable.getClass().getName();
+    }
+
+    @SuppressFBWarnings(value = {"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE", "DCN_NULLPOINTER_EXCEPTION"},
+            justification = "Deserialization can leave a null Throwable, GROOVY-8936 is fixed only in Groovy 4")
+    private static String errorMessage(ErrorAction error) {
+        Throwable throwable = error.getError();
+        if (throwable == null) {
+            // rare cases, for example serialization problems
+            return "No message: null Throwable on error";
+        }
+        try {
+            return throwable.getMessage();
+        } catch (NullPointerException npe) {
+            // GROOVY-8936
+            return "No message: NullPointerException on .getMessage()";
         }
     }
 
@@ -147,20 +163,26 @@ public class PipelineStageViewExtractor {
      * @param workflowRun - pipeline run
      */
     public static void extractConsoleLogs(WorkflowRun workflowRun) {
-        FlowExecution execution = workflowRun.getExecution();
-        ExecutionNodeExtractor visitor = new ExecutionNodeExtractor(workflowRun);
-        if (execution != null) {
-            ForkScanner.visitSimpleChunks(execution.getCurrentHeads(), visitor, new LabelledChunkFinder());
-        }
+        getConsoleLogs(workflowRun).forEach((nodeName, messages) -> {
+            StringBuilder stringBuilder = new StringBuilder();
+            messages.forEach(s -> {
+                stringBuilder.append("[").append(DATETIME_FORMATTER.format(new Date()))
+                        .append("] ").append(" ")
+                        .append(s).append("\n");
+            });
+            logSenderHelper.sendConsoleLogs(stringBuilder.toString(), workflowRun.getParent().getFullName(), workflowRun.getNumber(), nodeName);
+        });
+    }
 
-        Map<String, String> nodeWithNames = visitor.getStages().stream()
-                .filter(stageNodeExt -> !stageNodeExt.getStatus().equals(StatusExt.NOT_EXECUTED))
-                .collect(Collectors.toMap(StageNodeExt::getId, StageNodeExt::getName));
-
+    /**
+     * @return the console log messages of the run, keyed by the name of the stage or parallel branch they belong to
+     */
+    static Map<String, Set<String>> getConsoleLogs(WorkflowRun workflowRun) {
         Map<String, Set<String>> logsNodeWise = new HashMap<>();
 
         FlowExecution exec = workflowRun.getExecution();
         if (exec != null) {
+            Map<String, String> nodeWithNames = PipelineStageCollector.collectLabels(exec);
             FlowGraphWalker walker = new FlowGraphWalker(exec);
             for (FlowNode node : walker) {
                 try {
@@ -196,16 +218,8 @@ public class PipelineStageViewExtractor {
                     LOG.log(Level.WARNING, "Error Sending console Logs", e);
                 }
             }
-            logsNodeWise.forEach((nodeName, messages) -> {
-                StringBuilder stringBuilder = new StringBuilder();
-                messages.forEach(s -> {
-                    stringBuilder.append("[").append(DATETIME_FORMATTER.format(new Date()))
-                            .append("] ").append(" ")
-                            .append(s).append("\n");
-                });
-                logSenderHelper.sendConsoleLogs(stringBuilder.toString(), workflowRun.getParent().getFullName(), workflowRun.getNumber(), nodeName);
-            });
         }
+        return logsNodeWise;
     }
 
     private static String getLogPrefix(FlowNode node, Map<String, String> nodeWithNames) {

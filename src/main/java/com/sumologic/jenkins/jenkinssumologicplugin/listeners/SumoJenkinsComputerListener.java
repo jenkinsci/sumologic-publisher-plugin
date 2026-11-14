@@ -10,8 +10,8 @@ import hudson.remoting.Channel;
 import hudson.slaves.ComputerListener;
 import hudson.slaves.OfflineCause;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 import static com.sumologic.jenkins.jenkinssumologicplugin.utility.CommonModelFactory.updateStatus;
 
@@ -53,7 +53,7 @@ public class SumoJenkinsComputerListener extends ComputerListener {
     }
 
     @Override
-    public void onOffline(@Nonnull Computer computer, @CheckForNull OfflineCause cause) {
+    public void onOffline(@NonNull Computer computer, @CheckForNull OfflineCause cause) {
         PluginDescriptorImpl pluginDescriptor = PluginDescriptorImpl.getInstance();
         if (pluginDescriptor.isPeriodicLogEnabled()) {
             updateStatus(computer, EventSourceEnum.COMPUTER_OFFLINE.getValue());

@@ -1,20 +1,20 @@
 package com.sumologic.jenkins.jenkinssumologicplugin.pipeline;
 
 
-import com.cloudbees.workflow.rest.external.ChunkVisitor;
 import com.sumologic.jenkins.jenkinssumologicplugin.constants.ParallelNodeTypeEnum;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.workflow.actions.WorkspaceAction;
 import org.jenkinsci.plugins.workflow.cps.nodes.StepEndNode;
 import org.jenkinsci.plugins.workflow.cps.nodes.StepStartNode;
+import org.jenkinsci.plugins.workflow.graph.BlockEndNode;
 import org.jenkinsci.plugins.workflow.graph.FlowNode;
 import org.jenkinsci.plugins.workflow.graph.FlowStartNode;
 import org.jenkinsci.plugins.workflow.graphanalysis.ForkScanner;
-import org.jenkinsci.plugins.workflow.job.WorkflowRun;
+import org.jenkinsci.plugins.workflow.graphanalysis.StandardChunkVisitor;
 import org.jenkinsci.plugins.workflow.steps.StepDescriptor;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,15 +32,14 @@ import static com.sumologic.jenkins.jenkinssumologicplugin.constants.SumoConstan
  * <p>
  * Created by Sourabh Jain on 5/2019.
  */
-public class ExecutionNodeExtractor extends ChunkVisitor {
+public class ExecutionNodeExtractor extends StandardChunkVisitor {
     private static final Logger LOG = Logger.getLogger(ExecutionNodeExtractor.class.getName());
     private final Map<String, String> workspaceNodes = new HashMap<>();
     private final Map<String, Set<String>> parallelNodes = new HashMap<>();
     private String execNodeName = null;
     private String execNodeStartId = null;
 
-    ExecutionNodeExtractor(@Nonnull WorkflowRun run) {
-        super(run);
+    ExecutionNodeExtractor() {
     }
 
     Map<String, String> getWorkspaceNodes() {
@@ -52,7 +51,16 @@ public class ExecutionNodeExtractor extends ChunkVisitor {
     }
 
     @Override
-    public void atomNode(@CheckForNull FlowNode before, @Nonnull FlowNode atomNode, @CheckForNull FlowNode after, @Nonnull ForkScanner scan) {
+    public void chunkEnd(@NonNull FlowNode endNode, @CheckForNull FlowNode afterBlock, @NonNull ForkScanner scanner) {
+        super.chunkEnd(endNode, afterBlock, scanner);
+        // the last node before a labelled node that is not a block end is also visited as an atom node
+        if (!(endNode instanceof BlockEndNode)) {
+            atomNode(null, endNode, afterBlock, scanner);
+        }
+    }
+
+    @Override
+    public void atomNode(@CheckForNull FlowNode before, @NonNull FlowNode atomNode, @CheckForNull FlowNode after, @NonNull ForkScanner scan) {
         try {
             findWhereCurrentNodeIsExecuting(atomNode);
             findParallelNode(scan, atomNode);
@@ -83,7 +91,7 @@ public class ExecutionNodeExtractor extends ChunkVisitor {
         }
     }
 
-    private void findParallelNode(@Nonnull ForkScanner scan, FlowNode atomNode) {
+    private void findParallelNode(@NonNull ForkScanner scan, FlowNode atomNode) {
         if (ParallelNodeTypeEnum.NORMAL.toString().equals(String.valueOf(scan.getCurrentType()))
                 && ParallelNodeTypeEnum.PARALLEL_BRANCH_START.toString().equals(String.valueOf(scan.getNextType()))
                 && scan.getCurrentParallelStartNode() != null) {
